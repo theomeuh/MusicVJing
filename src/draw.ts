@@ -23,14 +23,20 @@ export function plotSine(ctx: CanvasRenderingContext2D, xOffset: number, yOffset
 
 }
 
-export function plotCircle(ctx: CanvasRenderingContext2D, amplitude: number) {
+export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, step: number) {
     ctx.beginPath()
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 4;
     ctx.strokeStyle = "rgb(66,44,255)";
 
+    const frequency = 3;
+    const phase = degreesToRadians(step);
+    const amplitude = angle => (radius / 5) * Math.cos(angle * frequency)
     Array.from(Array(360).keys())   // every degree
         .map(degree => degreesToRadians(degree))    // rad
-        .map(rad => ({ x: amplitude * Math.cos(rad), y: amplitude * Math.sin(rad) }))  
+        .map(rad => ({
+            x: amplitude(rad + phase) + radius * Math.cos(rad),
+            y: amplitude(rad + phase) + radius * Math.sin(rad)
+        }))
         .forEach(point => ctx.lineTo(point.x, point.y))
 
     ctx.stroke()

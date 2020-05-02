@@ -20,9 +20,9 @@ function draw() {
     // context.save();
 
     // plotSine(context, step, 0);
-    plotCircle(context, 50);
+    plotCircle(context, 200, step);
     // context.restore();
 
-    step += 4;
+    step ++;
     window.requestAnimationFrame(draw);
 }
