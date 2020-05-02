@@ -1,4 +1,4 @@
-import { plotSine } from "./draw";
+import { plotSine, plotCircle } from "./draw";
 
 var step = 0;  // Animation step
 init();
@@ -19,7 +19,8 @@ function draw() {
     context.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     // context.save();
 
-    plotSine(context, step, 0);
+    // plotSine(context, step, 0);
+    plotCircle(context, 50);
     // context.restore();
 
     step += 4;
