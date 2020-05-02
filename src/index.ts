@@ -19,7 +19,7 @@ function plotSine(ctx: CanvasRenderingContext2D, xOffset: number, yOffset: numbe
     const frequency = 20;
     ctx.moveTo(x, y + yOffset);
     while (x < width) {
-        y = height / 2 + amplitude * Math.sin((x + xOffset) / frequency);
+        y = amplitude * Math.sin((x + xOffset) / frequency);
         ctx.lineTo(x, y);
         x++;
     }
@@ -31,13 +31,14 @@ function draw() {
     const context = canvas.getContext("2d");
 
     canvas.style.border = '1px solid #63eccd';
-    canvas.width = 1500;
-    canvas.height = 700;
+    canvas.width = 1600;
+    canvas.height = 850;
 
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.translate(canvas.width / 2, canvas.height / 2)
+    context.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     // context.save();
 
-    plotSine(context, step, 50);
+    plotSine(context, step, 0);
     // context.restore();
 
     step += 4;
