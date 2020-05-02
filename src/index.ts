@@ -23,6 +23,6 @@ function draw() {
     plotCircle(context, 200, step);
     // context.restore();
 
-    step ++;
+    step++;
     window.requestAnimationFrame(draw);
 }
