@@ -1,7 +1,7 @@
 import { degreesToRadians } from "./utils";
 
 
-export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, frame: number) {
+export function plotCircle(ctx: CanvasRenderingContext2D, radius = 200) {
     // DEBUG CIRCLE
     ctx.beginPath()
     ctx.lineWidth = 1;
