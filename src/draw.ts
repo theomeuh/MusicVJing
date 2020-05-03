@@ -17,13 +17,13 @@ export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, frame:
 }
 
 function runningCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
-    const shapeFunction: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
-    movingCircle(ctx, frame, radius, shapeFunction)
+    const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
+    movingCircle(ctx, frame, radius, shape)
 }
 
 function oscillatingCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
-    const shapeFunction: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
-    movingCircle(ctx, frame, radius, shapeFunction)
+    const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
+    movingCircle(ctx, frame, radius, shape)
 }
 
 function movingCircle(ctx: CanvasRenderingContext2D, frame: number, radius: number, shapeFunction: ShapeFunction) {
