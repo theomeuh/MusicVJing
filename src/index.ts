@@ -1,6 +1,6 @@
 import { plotCircle } from "./draw";
 
-var step = 0;  // Animation step
+var frame = 0;  // Animation frame
 init();
 
 function init() {
@@ -19,9 +19,9 @@ function draw() {
     context.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     // context.save();
 
-    plotCircle(context, 200, step);
+    plotCircle(context, 200, frame);
     // context.restore();
 
-    step++;
+    frame++;
     window.requestAnimationFrame(draw);
 }

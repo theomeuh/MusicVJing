@@ -1,12 +1,12 @@
 import { degreesToRadians } from "./utils";
 
 
-export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, step: number) {
+export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, frame: number) {
     // Running wavy circle
-    runningCircle(ctx, step)
+    runningCircle(ctx, frame)
 
     // Oscillating wavy circle
-    oscillatingCircle(ctx, step)
+    oscillatingCircle(ctx, frame)
 
     // DEBUG CIRCLE
     ctx.beginPath()
@@ -16,42 +16,33 @@ export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, step: 
     ctx.stroke()
 }
 
-export function runningCircle(ctx: CanvasRenderingContext2D, step: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
-    // phase is the time dependent part of the shape
-    // angle defines the shape depending on the position on the curve
-    const phase = degreesToRadians(step);   // As is, 1 degree (over 360) per animation
-    const shape = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
+function runningCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
+    const shapeFunction: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
+    movingCircle(ctx, frame, radius, shapeFunction)
+}
 
+function oscillatingCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
+    const shapeFunction: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
+    movingCircle(ctx, frame, radius, shapeFunction)
+}
+
+function movingCircle(ctx: CanvasRenderingContext2D, frame: number, radius: number, shapeFunction: ShapeFunction) {
     ctx.beginPath()
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgb(66,44,255)";
 
+    const phase = degreesToRadians(frame);   // As is, 1 degree (over 360) per animation
     Array.from(Array(360).keys())   // every degree
         .map(degree => degreesToRadians(degree))    // rad
         .map(rad => ({
-            x: radius * (shape(rad, phase) + 1) * Math.cos(rad),     // radius * (s(t,theta) + const) * polar2cart
-            y: radius * (shape(rad, phase) + 1) * Math.sin(rad)
+            x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),     // radius * (s(t,theta) + const) * polar2cart
+            y: radius * (shapeFunction(rad, phase) + 1) * Math.sin(rad)
         }))
         .forEach(point => ctx.lineTo(point.x, point.y))
     ctx.stroke()
 }
 
-export function oscillatingCircle(ctx: CanvasRenderingContext2D, step: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
-    // phase is the time dependent part of the shape
-    // angle defines the shape depending on the position on the curve
-    const phase = degreesToRadians(step);   // As is, 1 degree (over 360) per animation
-    const shape = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
 
-    ctx.beginPath()
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgb(66,44,255)";
-
-    Array.from(Array(360).keys())   // every degree
-        .map(degree => degreesToRadians(degree))    // rad
-        .map(rad => ({
-            x: radius * (shape(rad, phase) + 1) * Math.cos(rad),     // radius * (s(t,theta) + const) * polar2cart
-            y: radius * (shape(rad, phase) + 1) * Math.sin(rad)
-        }))
-        .forEach(point => ctx.lineTo(point.x, point.y))
-    ctx.stroke()
-}
+// angle defines the shape depending on the position on the curve
+// phase is the time dependent part of the shape
+type ShapeFunction = (angle: number, phase: number) => number
