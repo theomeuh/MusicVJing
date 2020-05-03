@@ -1,4 +1,4 @@
-import { plotCircle } from "./draw";
+import { plotCircle, oscillatingCircle, runningCircle } from "./draw";
 
 var frame = 0;  // Animation frame
 init();
@@ -8,20 +8,26 @@ function init() {
 }
 
 function draw() {
-    const canvas = <HTMLCanvasElement>document.getElementById("canvas");
-    const context = canvas.getContext("2d");
+    const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const potar1 = (<HTMLInputElement>document.getElementById('potar1')).valueAsNumber
 
     canvas.style.border = '1px solid #63eccd';
     canvas.width = window.innerWidth * 2 / 3;
     canvas.height = window.innerHeight * 4 / 5;
 
-    context.translate(canvas.width / 2, canvas.height / 2)
-    context.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+    ctx.translate(canvas.width / 2, canvas.height / 2)
+    ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
     // context.save();
 
-    plotCircle(context, 200, frame);
-    // context.restore();
+    plotCircle(ctx, 200, frame);
 
+    // Running wavy circle
+    runningCircle(ctx, frame)
+    // Oscillating wavy circle
+    oscillatingCircle(ctx, frame, 200, potar1)
+
+    // context.restore();
     frame++;
     window.requestAnimationFrame(draw);
 }

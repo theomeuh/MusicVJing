@@ -2,12 +2,6 @@ import { degreesToRadians } from "./utils";
 
 
 export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, frame: number) {
-    // Running wavy circle
-    runningCircle(ctx, frame)
-
-    // Oscillating wavy circle
-    oscillatingCircle(ctx, frame)
-
     // DEBUG CIRCLE
     ctx.beginPath()
     ctx.lineWidth = 1;
@@ -16,12 +10,12 @@ export function plotCircle(ctx: CanvasRenderingContext2D, radius: number, frame:
     ctx.stroke()
 }
 
-function runningCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
+export function runningCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
     const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
     movingCircle(ctx, frame, radius, shape)
 }
 
-function oscillatingCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
+export function oscillatingCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
     const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
     movingCircle(ctx, frame, radius, shape)
 }
