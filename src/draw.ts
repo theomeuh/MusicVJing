@@ -10,17 +10,29 @@ export function plotCircle(ctx: CanvasRenderingContext2D, radius = 200) {
     ctx.stroke()
 }
 
-export function runningCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 12, shapeFactor = 5) {
+export function runningCircle({
+    ctx,
+    frame,
+    radius = 200,
+    shapeFactor = 5,
+    frequencySpace = 12
+}: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
-    movingCircle(ctx, frame, radius, shape)
+    movingCircleFactory(ctx, frame, radius, shape)
 }
 
-export function oscillatingCircle(ctx: CanvasRenderingContext2D, frame: number, radius = 200, frequencySpace = 4, shapeFactor = 5) {
+export function oscillatingCircle({
+    ctx,
+    frame,
+    radius = 200,
+    shapeFactor = 5,
+    frequencySpace = 4
+}: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
-    movingCircle(ctx, frame, radius, shape)
+    movingCircleFactory(ctx, frame, radius, shape)
 }
 
-function movingCircle(ctx: CanvasRenderingContext2D, frame: number, radius: number, shapeFunction: ShapeFunction) {
+function movingCircleFactory(ctx: CanvasRenderingContext2D, frame: number, radius: number, shapeFunction: ShapeFunction) {
     ctx.beginPath()
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgb(66,44,255)";
@@ -37,6 +49,14 @@ function movingCircle(ctx: CanvasRenderingContext2D, frame: number, radius: numb
 }
 
 
-// angle defines the shape depending on the position on the curve
+// angle defines the shape depending on the position (theta polar coordinate) on the curve
 // phase is the time dependent part of the shape
 type ShapeFunction = (angle: number, phase: number) => number
+
+export interface MovingCircleParams {
+    ctx: CanvasRenderingContext2D,
+    frame: number,
+    radius?: number,
+    frequencySpace?: number,
+    shapeFactor?: number,
+}

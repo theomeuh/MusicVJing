@@ -27,12 +27,14 @@ function draw() {
     plotCircle(ctx);
 
     // Running wavy circle
-    runningCircle(ctx, frame)
+    runningCircle({ ctx, frame })
     // Oscillating wavy circle
-    const frequencySpace = potar1.valueAsNumber
-    const shapeFactor = potar2.valueAsNumber
-    oscillatingCircle(ctx, frame, radius, frequencySpace, shapeFactor)
-
+    oscillatingCircle({
+        ctx,
+        frame,
+        frequencySpace: potar1.valueAsNumber,
+        shapeFactor: potar2.valueAsNumber
+    })
     // context.restore();
     frame++;
     window.requestAnimationFrame(draw);
