@@ -1,5 +1,6 @@
 // entrypoint
 
+import { setMicrophone } from "./audio";
 import { oscillatingCircle, plotDebugCircle, runningCircle } from "./draw";
 import { canvas, canvasCtx, potar1, potar2 } from "./global";
 
@@ -31,3 +32,5 @@ function draw() {
     frame++;
     window.requestAnimationFrame(draw);
 }
+
+setMicrophone()
