@@ -5,12 +5,21 @@ import { audioCtx, canvasCtx, canvas } from "./global";
 
 export function setMicrophone() {
     navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => visualize(stream))
+        .then(stream => visualize(audioCtx.createMediaStreamSource(stream)))
         .catch(err => console.log("getUserMedia error: " + err))
 }
 
-function visualize(stream: MediaStream) {
-    const source = audioCtx.createMediaStreamSource(stream);
+export function setSinWave() {
+    var oscillator = audioCtx.createOscillator();
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
+    oscillator.start();
+
+    visualize(oscillator)
+}
+
+function visualize(audioNode: AudioNode) {
+    const source = audioNode;
     const analyser = audioCtx.createAnalyser();
 
     analyser.fftSize = 2048;

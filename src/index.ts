@@ -1,6 +1,6 @@
 // entrypoint
 
-import { setMicrophone } from "./audio";
+import { setMicrophone, setSinWave } from "./audio";
 import { oscillatingCircle, plotDebugCircle, runningCircle } from "./draw";
 import { canvas, canvasCtx, potar1, potar2 } from "./global";
 
@@ -33,4 +33,5 @@ function draw() {
     window.requestAnimationFrame(draw);
 }
 
-setMicrophone()
+// setMicrophone()
+setSinWave()
