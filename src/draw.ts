@@ -1,7 +1,10 @@
+// manage visual part of project
+
+import { canvasCtx as ctx } from "./global";
 import { degreesToRadians } from "./utils";
 
 
-export function plotCircle(ctx: CanvasRenderingContext2D, radius = 200) {
+export function plotDebugCircle(radius = 200) {
     // DEBUG CIRCLE
     ctx.beginPath()
     ctx.lineWidth = 1;
@@ -11,28 +14,26 @@ export function plotCircle(ctx: CanvasRenderingContext2D, radius = 200) {
 }
 
 export function runningCircle({
-    ctx,
     frame,
     radius = 200,
     shapeFactor = 5,
     frequencySpace = 12
 }: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
-    movingCircleFactory(ctx, frame, radius, shape)
+    movingCircleFactory(frame, radius, shape)
 }
 
 export function oscillatingCircle({
-    ctx,
     frame,
     radius = 200,
     shapeFactor = 5,
     frequencySpace = 4
 }: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
-    movingCircleFactory(ctx, frame, radius, shape)
+    movingCircleFactory(frame, radius, shape)
 }
 
-function movingCircleFactory(ctx: CanvasRenderingContext2D, frame: number, radius: number, shapeFunction: ShapeFunction) {
+function movingCircleFactory(frame: number, radius: number, shapeFunction: ShapeFunction) {
     ctx.beginPath()
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgb(66,44,255)";
@@ -54,7 +55,6 @@ function movingCircleFactory(ctx: CanvasRenderingContext2D, frame: number, radiu
 type ShapeFunction = (angle: number, phase: number) => number
 
 export interface MovingCircleParams {
-    ctx: CanvasRenderingContext2D,
     frame: number,
     radius?: number,
     frequencySpace?: number,
