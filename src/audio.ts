@@ -3,59 +3,64 @@
 import { audioCtx, canvasCtx, canvas } from "./global";
 
 
-export function setMicrophone() {
+export function visualizeMicrophone(visualize: ((audioNode: AudioNode) => void)) {
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => visualize(audioCtx.createMediaStreamSource(stream)))
         .catch(err => console.log("getUserMedia error: " + err))
 }
 
-export function setSinWave() {
-    var oscillator = audioCtx.createOscillator();
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
-    oscillator.start();
+// export function setSinWave() {
+//     var oscillator = audioCtx.createOscillator();
+//     oscillator.type = 'square';
+//     oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
+//     oscillator.start();
 
-    visualize(oscillator)
-}
+//     visualize(oscillator)
+// }
 
-function visualize(audioNode: AudioNode) {
-    const source = audioNode;
-    const analyser = audioCtx.createAnalyser();
+// function visualize(audioNode: AudioNode) {
+//     const source = audioNode;
+//     const analyser = audioCtx.createAnalyser();
+//     const bufferLength = analyser.frequencyBinCount;
+//     const dataArray = new Uint8Array(bufferLength);
 
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+//     analyser.fftSize = 2048;
+//     source.connect(analyser);
 
-    source.connect(analyser);
-    // analyser.connect(audioCtx.destination);
+//     draw()
+//     function draw() {
+//         const WIDTH = canvas.width
+//         const HEIGHT = canvas.height;
 
-    draw()
+//         requestAnimationFrame(draw);
 
-    function draw() {
-        const WIDTH = canvas.width
-        const HEIGHT = canvas.height;
+//         analyser.getByteTimeDomainData(dataArray);
 
-        requestAnimationFrame(draw);
+//         canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+//         canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-        analyser.getByteTimeDomainData(dataArray);
+//         canvasCtx.lineWidth = 2;
+//         canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+//         canvasCtx.beginPath();
 
-        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+//         let sliceWidth = WIDTH * 1.0 / bufferLength;
+//         let x = 0;
+//         for (let i = 0; i < bufferLength; i++) {
+//             let v = dataArray[i] / 128.0;
+//             let y = v * HEIGHT / 2;
+//             if (i === 0) { canvasCtx.moveTo(x, y); }
+//             else { canvasCtx.lineTo(x, y); }
+//             x += sliceWidth;
+//         }
+//         canvasCtx.lineTo(canvas.width, canvas.height / 2);
+//         canvasCtx.stroke();
+//     }
+// }
 
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
-        canvasCtx.beginPath();
+export function getMaxFrequencyRange(freqArray: Uint8Array, minFreq: number, maxFreq: number) {
+    const maxFreqSample = audioCtx.sampleRate / 2;
+    const minIndex = Math.round(minFreq / maxFreqSample * freqArray.length);
+    const maxIndex = Math.round(maxFreq / maxFreqSample * freqArray.length);
 
-        let sliceWidth = WIDTH * 1.0 / bufferLength;
-        let x = 0;
-        for (let i = 0; i < bufferLength; i++) {
-            let v = dataArray[i] / 128.0;
-            let y = v * HEIGHT / 2;
-            if (i === 0) { canvasCtx.moveTo(x, y); }
-            else { canvasCtx.lineTo(x, y); }
-            x += sliceWidth;
-        }
-        canvasCtx.lineTo(canvas.width, canvas.height / 2);
-        canvasCtx.stroke();
-    }
+    return Math.max(...freqArray.slice(minIndex, maxIndex)) / 256
 }

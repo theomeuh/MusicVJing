@@ -16,27 +16,29 @@ export function plotDebugCircle(radius = 200) {
 export function runningCircle({
     frame,
     radius = 200,
+    color = 'rgb(66,44,255)',
     shapeFactor = 5,
     frequencySpace = 12
 }: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
-    movingCircleFactory(frame, radius, shape)
+    movingCircleFactory(frame, radius, color, shape)
 }
 
 export function oscillatingCircle({
     frame,
     radius = 200,
+    color = 'rgb(66,44,255)',
     shapeFactor = 5,
     frequencySpace = 4
 }: MovingCircleParams) {
     const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
-    movingCircleFactory(frame, radius, shape)
+    movingCircleFactory(frame, radius, color, shape)
 }
 
-function movingCircleFactory(frame: number, radius: number, shapeFunction: ShapeFunction) {
+function movingCircleFactory(frame: number, radius: number, color: string, shapeFunction: ShapeFunction) {
     ctx.beginPath()
     ctx.lineWidth = 4;
-    ctx.strokeStyle = "rgb(66,44,255)";
+    ctx.strokeStyle = color;
 
     const phase = degreesToRadians(frame);   // As is, 1 degree (over 360) per animation
     Array.from(Array(360).keys())   // every degree
@@ -57,6 +59,7 @@ type ShapeFunction = (angle: number, phase: number) => number
 export interface MovingCircleParams {
     frame: number,
     radius?: number,
+    color?: string,
     frequencySpace?: number,
     shapeFactor?: number,
 }
