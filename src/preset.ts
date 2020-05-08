@@ -13,8 +13,8 @@ export const runningCircleMicViz = ((frame: number) => {
         analyser.fftSize = 2048;
         source.connect(analyser);
 
-        draw()
-        function draw() {
+        // defines and immediately calls draw
+        (function draw(){
             canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
             analyser.getByteFrequencyData(dataArray);
 
@@ -33,6 +33,6 @@ export const runningCircleMicViz = ((frame: number) => {
 
             frame++
             requestAnimationFrame(draw);
-        }
+         }());
     })
 });
