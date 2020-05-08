@@ -3,12 +3,8 @@
 import { audioCtx, canvasCtx, canvas } from "./global";
 
 
-export function handleMicStream(callback: AudioSourceCallback) {
-    // handle the query of the microphone and apply the callback funtion if ok
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => callback(audioCtx.createMediaStreamSource(stream)))
-        .catch(err => console.log("getUserMedia error: " + err))
-}
+export const getMicStream = () => navigator.mediaDevices.getUserMedia({ audio: true });
+
 
 export function sinWaveSource(frequency: number) {
     var oscillator = audioCtx.createOscillator();
