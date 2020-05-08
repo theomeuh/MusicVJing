@@ -6,11 +6,11 @@ import { degreesToRadians } from "./utils";
 
 export function plotDebugCircle(radius = 200) {
     // DEBUG CIRCLE
-    ctx.beginPath()
+    ctx.beginPath();
     ctx.lineWidth = 1;
     ctx.strokeStyle = "blue";
-    ctx.arc(0, 0, radius, 0, 2 * Math.PI)
-    ctx.stroke()
+    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+    ctx.stroke();
 }
 
 export function runningCircle({
@@ -20,8 +20,8 @@ export function runningCircle({
     shapeFactor = 5,
     frequencySpace = 12
 }: MovingCircleParams) {
-    const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor
-    movingCircleFactory(frame, radius, color, shape)
+    const shape: ShapeFunction = (angle, phase) => Math.cos((angle + phase) * frequencySpace) / shapeFactor;
+    movingCircleFactory(frame, radius, color, shape);
 }
 
 export function oscillatingCircle({
@@ -31,12 +31,12 @@ export function oscillatingCircle({
     shapeFactor = 5,
     frequencySpace = 4
 }: MovingCircleParams) {
-    const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor
-    movingCircleFactory(frame, radius, color, shape)
+    const shape: ShapeFunction = (angle, phase) => Math.cos(phase) * Math.cos(frequencySpace * angle) / shapeFactor;
+    movingCircleFactory(frame, radius, color, shape);
 }
 
 function movingCircleFactory(frame: number, radius: number, color: string, shapeFunction: ShapeFunction) {
-    ctx.beginPath()
+    ctx.beginPath();
     ctx.lineWidth = 4;
     ctx.strokeStyle = color;
 
@@ -47,8 +47,8 @@ function movingCircleFactory(frame: number, radius: number, color: string, shape
             x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),
             y: radius * (shapeFunction(rad, phase) + 1) * Math.sin(rad)
         }))
-        .forEach(point => ctx.lineTo(point.x, point.y))
-    ctx.stroke()
+        .forEach(point => ctx.lineTo(point.x, point.y));
+    ctx.stroke();
 }
 
 
