@@ -3,21 +3,22 @@
 import { audioCtx, canvasCtx, canvas } from "./global";
 
 
-export function handleMicStream(callback: MicCallback) {
+export function handleMicStream(callback: AudioSourceCallback) {
     // handle the query of the microphone and apply the callback funtion if ok
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => callback(audioCtx.createMediaStreamSource(stream)))
         .catch(err => console.log("getUserMedia error: " + err))
 }
 
-// export function setSinWave() {
-//     var oscillator = audioCtx.createOscillator();
-//     oscillator.type = 'square';
-//     oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime); // value in hertz
-//     oscillator.start();
+export function sinWaveSource(frequency: number) {
+    var oscillator = audioCtx.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime); // value in hertz
+    oscillator.start();
 
-//     visualize(oscillator)
-// }
+    return oscillator
+}
+
 
 export function getMaxFrequencyRange(freqArray: Uint8Array, minFreq: number, maxFreq: number) {
     const maxFreqSample = audioCtx.sampleRate / 2;
@@ -27,4 +28,4 @@ export function getMaxFrequencyRange(freqArray: Uint8Array, minFreq: number, max
     return Math.max(...freqArray.slice(minIndex, maxIndex)) / 256
 }
 
-type MicCallback = (audioNode: AudioNode) => void;
+type AudioSourceCallback = (audioNode: AudioNode) => void;
