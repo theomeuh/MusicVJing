@@ -44,7 +44,7 @@ function movingCircleFactory(frame: number, radius: number, color: string, shape
     Array.from(Array(360).keys())   // every degree
         .map(degree => degreesToRadians(degree))    // rad
         .map(rad => ({
-            x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),     // radius * (s(t,theta) + const) * polar2cart
+            x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),
             y: radius * (shapeFunction(rad, phase) + 1) * Math.sin(rad)
         }))
         .forEach(point => ctx.lineTo(point.x, point.y))
