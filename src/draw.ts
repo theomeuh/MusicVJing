@@ -1,6 +1,6 @@
 // manage visual part of project
 
-import { canvasCtx as ctx } from "./global";
+import { canvasCtx as ctx, canvas } from "./global";
 import { degreesToRadians } from "./utils";
 
 
@@ -11,6 +11,20 @@ export function plotDebugCircle(radius = 200) {
     ctx.strokeStyle = "blue";
     ctx.arc(0, 0, radius, 0, 2 * Math.PI);
     ctx.stroke();
+}
+
+export function clearCanvas() {
+    // Store the current transformation matrix
+    ctx.save();
+
+    // Use the identity matrix
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Restore the transform
+    ctx.restore();
 }
 
 export function runningCircle({

@@ -1,6 +1,6 @@
 import { getMaxFrequencyRange, getMicStream, sinWaveSource } from "./audio";
-import { runningCircle } from "./draw";
-import { audioCtx, canvas, canvasCtx } from "./global";
+import { clearCanvas, runningCircle } from "./draw";
+import { audioCtx } from "./global";
 import { percentageTofreq, percentageToGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
@@ -19,7 +19,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
     // audio send to analyser is amplified up to 4
     const maxGain = 4
-    const gainPotar = percentageToGain(maxGain);  
+    const gainPotar = percentageToGain(maxGain);
     potar1.value = (100 / maxGain).toString();    // initial, gain is one
 
     // set up nodes and connections
@@ -30,7 +30,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
     (function animationLoop() {
         analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
-        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+        clearCanvas();
         analyser.getByteFrequencyData(dataArray);
 
         // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10
@@ -69,7 +69,7 @@ export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputEl
         source.frequency.setValueAtTime(freq, audioCtx.currentTime);
         console.log(freq);
 
-        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+        clearCanvas();
         analyser.getByteFrequencyData(dataArray);
 
         // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10
