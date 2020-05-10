@@ -11,5 +11,5 @@ canvasCtx.translate(canvas.width / 2, canvas.height / 2)
 
 var frame = 0;  // Animation frame
 
-runningCircleMicViz(frame);
+runningCircleMicViz(frame, potar1);
 // runningCircleFrequencySweepViz(frame, potar1);

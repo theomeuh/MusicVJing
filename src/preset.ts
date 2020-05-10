@@ -1,24 +1,35 @@
 import { getMaxFrequencyRange, getMicStream, sinWaveSource } from "./audio";
 import { runningCircle } from "./draw";
-import { audioCtx, canvas, canvasCtx, potar1 } from "./global";
-import { percentageTofreq } from "./utils";
+import { audioCtx, canvas, canvasCtx } from "./global";
+import { percentageTofreq, percentageToGain } from "./utils";
 
-export async function runningCircleMicViz(frame: number) {
+export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
+    // get audio input stream  (mic or speakers)
     let audioSource: AudioNode;
     await getMicStream()
         .then(micStream => audioSource = audioCtx.createMediaStreamSource(micStream))
         .catch(() => console.log("GUM error"))
 
+    // create audio graph nodes
     const source = audioSource;
+    const analyserGain = audioCtx.createGain();
     const analyser = audioCtx.createAnalyser();
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
 
-    analyser.fftSize = 2048;
-    source.connect(analyser);
+    // audio send to analyser is amplified up to 4
+    const maxGain = 4
+    const gainPotar = percentageToGain(maxGain);  
+    potar1.value = (100 / maxGain).toString();    // initial, gain is one
 
-    // defines and immediately calls draw
+    // set up nodes and connections
+    analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
+    analyser.fftSize = 2048;
+    source.connect(analyserGain)
+    analyserGain.connect(analyser);
+
     (function animationLoop() {
+        analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
         canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
         analyser.getByteFrequencyData(dataArray);
 
@@ -41,7 +52,7 @@ export async function runningCircleMicViz(frame: number) {
 };
 
 export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputElement) => {
-    const sourceFrequency = percentageTofreq(potar1.valueAsNumber);
+    const sourceFrequency = percentageTofreq(potar.valueAsNumber);
     const source = sinWaveSource(sourceFrequency);
 
     const analyser = audioCtx.createAnalyser();
@@ -52,9 +63,9 @@ export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputEl
     source.connect(analyser);
     source.connect(audioCtx.destination);
 
-    // defines and immediately calls draw
+    // defines and immediately calls
     (function animationLoop() {
-        const freq = percentageTofreq(potar1.valueAsNumber);
+        const freq = percentageTofreq(potar.valueAsNumber);
         source.frequency.setValueAtTime(freq, audioCtx.currentTime);
         console.log(freq);
 

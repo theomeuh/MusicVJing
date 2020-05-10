@@ -5,11 +5,9 @@ export const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 export const canvasCtx = canvas.getContext('2d');
 
 // control
+// range is [0..100]. Their values should be wrapped 
 export const potar1 = <HTMLInputElement>document.getElementById('potar1');
 export const potar2 = <HTMLInputElement>document.getElementById('potar2');
-
-export let potar3: number;
-export let potar4: number;
 
 // audio
 export var audioCtx = new window.AudioContext();
