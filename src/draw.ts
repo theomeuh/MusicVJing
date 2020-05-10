@@ -55,7 +55,7 @@ function movingCircleFactory(frame: number, radius: number, color: string, shape
     ctx.strokeStyle = color;
 
     const phase = degreesToRadians(frame);   // As is, 1 degree (over 360) per animation
-    Array.from(Array(360).keys())   // every degree
+    Array.from(Array(361).keys())   // every degree
         .map(degree => degreesToRadians(degree))    // rad
         .map(rad => ({
             x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),
