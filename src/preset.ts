@@ -1,6 +1,6 @@
 import { getMaxFrequencyRange, getMicStream, sinWaveSource } from "./audio";
 import { clearCanvas, runningCircle } from "./draw";
-import { audioCtx } from "./global";
+import { audioCtx, canvasCtx } from "./global";
 import { percentageTofreq, percentageToGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
@@ -45,6 +45,14 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         runningCircle({ frame, color: 'olivedrab', shapeFactor: shapeFactorMedium1 })
         runningCircle({ frame, color: 'mediumturquoise', shapeFactor: shapeFactorMedium2 })
         runningCircle({ frame, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
+
+        // saturation warning
+        if (getMaxFrequencyRange(dataArray, 1, 10000) > 0.9) {
+            canvasCtx.beginPath();
+            canvasCtx.fillStyle = 'red';
+            canvasCtx.arc(0, 0, 1, 0, 2 * Math.PI);
+            canvasCtx.fill();
+        }
 
         frame++
         requestAnimationFrame(animationLoop);
