@@ -1,6 +1,6 @@
 import { getMaxValueInFreqRange, getMicStream, sinWaveSource } from "./audio";
-import { clearCanvas, runningCircle } from "./draw";
-import { audioCtx, canvasCtx, canvas } from "./global";
+import { runningCircle } from "./draw";
+import { audioCtx, canvas, canvasCtx, debugCanvas, debugCanvasCtx } from "./global";
 import { percentageTofreq, percentageToGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
@@ -36,16 +36,9 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
     // animation loop
     (function animationLoop() {
-        clearCanvas();
+        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
         analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
         analyser.getByteFrequencyData(dataArray);
-
-        // // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10
-        // const shapeFactorBass1 = 10 - 8 * getMaxFrequencyRange(dataArray, 1, 120)
-        // const shapeFactorBass2 = 10 - 8 * getMaxFrequencyRange(dataArray, 120, 350)
-        // const shapeFactorMedium1 = 10 - 8 * getMaxFrequencyRange(dataArray, 350, 600)
-        // const shapeFactorMedium2 = 10 - 8 * getMaxFrequencyRange(dataArray, 600, 1000)
-        // const shapeFactorHigh = 10 - 8 * getMaxFrequencyRange(dataArray, 1000, 10000)
 
         // At maximum, moving circle have an amplitude of 1/3 of the radius. Min is 1/20
         const shapeFactorBass1 = shapeFactor(getMaxValueInFreqRange(dataArray, 1, 120));
@@ -53,7 +46,6 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         const shapeFactorMedium1 = shapeFactor(getMaxValueInFreqRange(dataArray, 350, 600));
         const shapeFactorMedium2 = shapeFactor(getMaxValueInFreqRange(dataArray, 600, 1000));
         const shapeFactorHigh = shapeFactor(getMaxValueInFreqRange(dataArray, 1000, 10000));
-
 
         runningCircle({ frame, radius, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
         runningCircle({ frame, radius, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
@@ -69,6 +61,18 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
             canvasCtx.fill();
         }
 
+        // bar graph
+        debugCanvasCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+        for (var i = 0; i < analyser.frequencyBinCount; i++) {
+            var value = dataArray[i];
+            var percent = value / 256;
+            var height = debugCanvas.height * percent;
+            var offset = debugCanvas.height - height - 1;
+            var barWidth = debugCanvas.width / analyser.frequencyBinCount;
+            var hue = i / analyser.frequencyBinCount * 360;
+            debugCanvasCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+            debugCanvasCtx.fillRect(i * barWidth, offset, barWidth, height);
+        }
         frame++
         requestAnimationFrame(animationLoop);
     }());
@@ -88,11 +92,12 @@ export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputEl
 
     // defines and immediately calls
     (function animationLoop() {
+        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+
         const freq = percentageTofreq(potar.valueAsNumber);
         source.frequency.setValueAtTime(freq, audioCtx.currentTime);
         console.log(freq);
 
-        clearCanvas();
         analyser.getByteFrequencyData(dataArray);
 
         // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10

@@ -13,20 +13,6 @@ export function plotDebugCircle(radius = 200) {
     ctx.stroke();
 }
 
-export function clearCanvas() {
-    // Store the current transformation matrix
-    ctx.save();
-
-    // Use the identity matrix
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-
-    // clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Restore the transform
-    ctx.restore();
-}
-
 export function runningCircle({
     frame,
     radius = 200,
