@@ -4,7 +4,7 @@ import { canvas, canvasCtx, potar1 } from "./global";
 import { runningCircleFrequencySweepViz, runningCircleMicViz } from "./preset";
 
 canvas.style.border = '1px solid #63eccd';
-canvas.width = window.innerWidth * 2 / 3;
+canvas.width = window.innerWidth * 9 / 10;
 canvas.height = window.innerHeight * 4 / 5;
 
 canvasCtx.translate(canvas.width / 2, canvas.height / 2)
