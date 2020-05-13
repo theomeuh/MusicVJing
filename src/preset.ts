@@ -1,6 +1,6 @@
-import { getMaxFrequencyRange, getMicStream, sinWaveSource } from "./audio";
+import { getMaxValueInFreqRange, getMicStream, sinWaveSource } from "./audio";
 import { clearCanvas, runningCircle } from "./draw";
-import { audioCtx, canvasCtx } from "./global";
+import { audioCtx, canvasCtx, canvas } from "./global";
 import { percentageTofreq, percentageToGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
@@ -28,9 +28,16 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     source.connect(analyserGain)
     analyserGain.connect(analyser);
 
+    // common const to draw circles
+    const minShapeFactor = 3;
+    const maxShapeFactor = 20;
+    const radius = 0.5 * canvas.height * minShapeFactor / (minShapeFactor + 1);
+    const shapeFactor = (freqValue: number) => maxShapeFactor - (maxShapeFactor - minShapeFactor) * freqValue;
+
+    // animation loop
     (function animationLoop() {
-        analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
         clearCanvas();
+        analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
         analyser.getByteFrequencyData(dataArray);
 
         // // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10
@@ -41,20 +48,21 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         // const shapeFactorHigh = 10 - 8 * getMaxFrequencyRange(dataArray, 1000, 10000)
 
         // At maximum, moving circle have an amplitude of 1/3 of the radius. Min is 1/20
-        const shapeFactorBass1 = 20 - 17 * getMaxFrequencyRange(dataArray, 1, 120)
-        const shapeFactorBass2 = 20 - 17 * getMaxFrequencyRange(dataArray, 120, 350)
-        const shapeFactorMedium1 = 20 - 17 * getMaxFrequencyRange(dataArray, 350, 600)
-        const shapeFactorMedium2 = 20 - 17 * getMaxFrequencyRange(dataArray, 600, 1000)
-        const shapeFactorHigh = 20 - 17 * getMaxFrequencyRange(dataArray, 1000, 10000)
+        const shapeFactorBass1 = shapeFactor(getMaxValueInFreqRange(dataArray, 1, 120));
+        const shapeFactorBass2 = shapeFactor(getMaxValueInFreqRange(dataArray, 120, 350));
+        const shapeFactorMedium1 = shapeFactor(getMaxValueInFreqRange(dataArray, 350, 600));
+        const shapeFactorMedium2 = shapeFactor(getMaxValueInFreqRange(dataArray, 600, 1000));
+        const shapeFactorHigh = shapeFactor(getMaxValueInFreqRange(dataArray, 1000, 10000));
 
-        runningCircle({ frame, radius: 200, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
-        runningCircle({ frame, radius: 200, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
-        runningCircle({ frame, radius: 200, color: 'olivedrab', shapeFactor: shapeFactorMedium1 })
-        runningCircle({ frame, radius: 200, color: 'mediumturquoise', shapeFactor: shapeFactorMedium2 })
-        runningCircle({ frame, radius: 200, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
+
+        runningCircle({ frame, radius, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
+        runningCircle({ frame, radius, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
+        runningCircle({ frame, radius, color: 'olivedrab', shapeFactor: shapeFactorMedium1 })
+        runningCircle({ frame, radius, color: 'mediumturquoise', shapeFactor: shapeFactorMedium2 })
+        runningCircle({ frame, radius, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
 
         // saturation warning
-        if (getMaxFrequencyRange(dataArray, 1, 10000) > 0.9) {
+        if (getMaxValueInFreqRange(dataArray, 1, 10000) > 0.9) {
             canvasCtx.beginPath();
             canvasCtx.fillStyle = 'red';
             canvasCtx.arc(0, 0, 2, 0, 2 * Math.PI);
@@ -88,11 +96,11 @@ export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputEl
         analyser.getByteFrequencyData(dataArray);
 
         // At maximum, moving circle have an amplitude of 1/2 of the radius. Min is 1/10
-        const shapeFactorBass1 = 10 - 8 * getMaxFrequencyRange(dataArray, 1, 120)
-        const shapeFactorBass2 = 10 - 8 * getMaxFrequencyRange(dataArray, 120, 350)
-        const shapeFactorMedium1 = 10 - 8 * getMaxFrequencyRange(dataArray, 350, 600)
-        const shapeFactorMedium2 = 10 - 8 * getMaxFrequencyRange(dataArray, 600, 1000)
-        const shapeFactorHigh = 10 - 8 * getMaxFrequencyRange(dataArray, 1000, 10000)
+        const shapeFactorBass1 = 10 - 8 * getMaxValueInFreqRange(dataArray, 1, 120)
+        const shapeFactorBass2 = 10 - 8 * getMaxValueInFreqRange(dataArray, 120, 350)
+        const shapeFactorMedium1 = 10 - 8 * getMaxValueInFreqRange(dataArray, 350, 600)
+        const shapeFactorMedium2 = 10 - 8 * getMaxValueInFreqRange(dataArray, 600, 1000)
+        const shapeFactorHigh = 10 - 8 * getMaxValueInFreqRange(dataArray, 1000, 10000)
 
         runningCircle({ frame, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
         runningCircle({ frame, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
