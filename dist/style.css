@@ -8,15 +8,3 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-.arrow {
-    color: aliceblue;
-    font-size: 120px;
-}
-
-.tuto {
-    color: aliceblue;
-    text-align: center;
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 1.35em;
-}
