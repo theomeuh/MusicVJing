@@ -41,9 +41,9 @@ function movingCircleFactory(frame: number, radius: number, color: string, shape
     ctx.strokeStyle = color;
 
     const phase = degreesToRadians(frame);   // As is, 1 degree (over 360) per animation
-    const nbLine = 200;
-    Array.from(Array(nbLine + 1).keys())   // nbLine + 1 points are required to draw nbLine lines
-        .map(v => 360 * v / nbLine)     // degree: [1..361].length = nbLine + 1
+    const lineCount = 200;
+    Array.from(Array(lineCount + 1).keys())   // lineCount + 1 points are required to draw lineCount lines
+        .map(v => 360 * v / lineCount)     // degree: [1..361].length = lineCount + 1
         .map(degree => degreesToRadians(degree))    // rad
         .map(rad => ({
             x: radius * (shapeFunction(rad, phase) + 1) * Math.cos(rad),
