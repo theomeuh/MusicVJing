@@ -13,4 +13,4 @@ export const potar1 = <HTMLInputElement>document.getElementById('potar1');
 export const potar2 = <HTMLInputElement>document.getElementById('potar2');
 
 // audio
-export var audioCtx = new window.AudioContext();
+export var audioCtx = new window.AudioContext();    // TODO offlineContext faster ? ?
