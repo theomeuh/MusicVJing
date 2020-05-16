@@ -15,7 +15,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     const analyserGain = audioCtx.createGain();
     const analyser = audioCtx.createAnalyser();
     const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const freqArray = new Uint8Array(bufferLength);
 
     // audio send to analyser is amplified up to 4
     const maxGain = 4
@@ -38,14 +38,14 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     (function animationLoop() {
         canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
         analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
-        analyser.getByteFrequencyData(dataArray);
+        analyser.getByteFrequencyData(freqArray);
 
         // At maximum, moving circle have an amplitude of 1/3 of the radius. Min is 1/20
-        const shapeFactorBass1 = shapeFactor(getMaxValueInFreqRange(dataArray, 1, 120));
-        const shapeFactorBass2 = shapeFactor(getMaxValueInFreqRange(dataArray, 120, 350));
-        const shapeFactorMedium1 = shapeFactor(getMaxValueInFreqRange(dataArray, 350, 600));
-        const shapeFactorMedium2 = shapeFactor(getMaxValueInFreqRange(dataArray, 600, 1000));
-        const shapeFactorHigh = shapeFactor(getMaxValueInFreqRange(dataArray, 1000, 10000));
+        const shapeFactorBass1 = shapeFactor(getMaxValueInFreqRange(freqArray, 1, 120));
+        const shapeFactorBass2 = shapeFactor(getMaxValueInFreqRange(freqArray, 120, 350));
+        const shapeFactorMedium1 = shapeFactor(getMaxValueInFreqRange(freqArray, 350, 600));
+        const shapeFactorMedium2 = shapeFactor(getMaxValueInFreqRange(freqArray, 600, 1000));
+        const shapeFactorHigh = shapeFactor(getMaxValueInFreqRange(freqArray, 1000, 10000));
 
         runningCircle({ frame, radius, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
         runningCircle({ frame, radius, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
@@ -54,7 +54,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         runningCircle({ frame, radius, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
 
         // saturation warning
-        if (getMaxValueInFreqRange(dataArray, 1, 10000) > 0.9) {
+        if (getMaxValueInFreqRange(freqArray, 1, 10000) > 0.9) {
             canvasCtx.beginPath();
             canvasCtx.fillStyle = 'red';
             canvasCtx.arc(0, 0, 2, 0, 2 * Math.PI);
