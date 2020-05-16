@@ -17,10 +17,10 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     const bufferLength = analyser.frequencyBinCount;
     const freqArray = new Uint8Array(bufferLength);
 
-    // audio send to analyser is amplified up to 4
+    // audio send to analyser is amplified up to maxGain
     const maxGain = 4
     const gainPotar = percentageToGain(maxGain);
-    potar1.value = (100 / maxGain).toString();    // initial, gain is one
+    potar1.value = (100 / maxGain).toString();    // initial gain is 1
 
     // set up nodes and connections
     analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
@@ -28,59 +28,70 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     source.connect(analyserGain)
     analyserGain.connect(analyser);
 
+    // animation loop
+    (function animationLoop() {
+        // clear canvas
+        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+        debugCanvasCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+
+        // read / write required data for animations
+        analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
+        analyser.getByteFrequencyData(freqArray);
+
+        // animate according to above data
+        mainAnimation(freqArray, frame);
+        saturationWarning(freqArray);
+        debugSpectrum(analyser, freqArray);
+
+        // increase frame count and request next animation
+        frame++
+        requestAnimationFrame(animationLoop);
+    }());
+};
+function mainAnimation(freqArray: Uint8Array, frame: number) {
     // common const to draw circles
     const minShapeFactor = 3;
     const maxShapeFactor = 20;
     const radius = 0.5 * canvas.height * minShapeFactor / (minShapeFactor + 1);
     const shapeFactor = (freqValue: number) => maxShapeFactor - (maxShapeFactor - minShapeFactor) * freqValue;
 
-    // animation loop
-    (function animationLoop() {
-        //TODO extract the 3 part in 3 function: runningCircle / debug / spectrum
-        canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-        analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
-        analyser.getByteFrequencyData(freqArray);
+    // At maximum, running circles have an amplitude of 1/3 of the radius. Min is 1/20
+    const shapeFactorBass1 = shapeFactor(maxPercentInFreqRange(freqArray, 1, 120));
+    const shapeFactorBass2 = shapeFactor(maxPercentInFreqRange(freqArray, 120, 350));
+    const shapeFactorMedium1 = shapeFactor(maxPercentInFreqRange(freqArray, 350, 600));
+    const shapeFactorMedium2 = shapeFactor(maxPercentInFreqRange(freqArray, 600, 1000));
+    const shapeFactorHigh = shapeFactor(maxPercentInFreqRange(freqArray, 1000, 10000));
 
-        // At maximum, moving circle have an amplitude of 1/3 of the radius. Min is 1/20
-        const shapeFactorBass1 = shapeFactor(maxPercentInFreqRange(freqArray, 1, 120));
-        const shapeFactorBass2 = shapeFactor(maxPercentInFreqRange(freqArray, 120, 350));
-        const shapeFactorMedium1 = shapeFactor(maxPercentInFreqRange(freqArray, 350, 600));
-        const shapeFactorMedium2 = shapeFactor(maxPercentInFreqRange(freqArray, 600, 1000));
-        const shapeFactorHigh = shapeFactor(maxPercentInFreqRange(freqArray, 1000, 10000));
-
-        runningCircle({ frame, radius, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
-        runningCircle({ frame, radius, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
-        runningCircle({ frame, radius, color: 'olivedrab', shapeFactor: shapeFactorMedium1 })
-        runningCircle({ frame, radius, color: 'mediumturquoise', shapeFactor: shapeFactorMedium2 })
-        runningCircle({ frame, radius, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
-
+    runningCircle({ frame, radius, color: 'mediumvioletred', shapeFactor: shapeFactorBass1 })
+    runningCircle({ frame, radius, color: 'mediumslateblue', shapeFactor: shapeFactorBass2 })
+    runningCircle({ frame, radius, color: 'olivedrab', shapeFactor: shapeFactorMedium1 })
+    runningCircle({ frame, radius, color: 'mediumturquoise', shapeFactor: shapeFactorMedium2 })
+    runningCircle({ frame, radius, color: 'mediumspringgreen', shapeFactor: shapeFactorHigh })
+}
+function saturationWarning(freqArray: Uint8Array) {
+    if (maxPercentInFreqRange(freqArray, 1, 10000) > 0.9) {
         // saturation warning
-        if (maxPercentInFreqRange(freqArray, 1, 10000) > 0.9) {
-            canvasCtx.beginPath();
-            canvasCtx.fillStyle = 'red';
-            canvasCtx.arc(0, 0, 2, 0, 2 * Math.PI);
-            canvasCtx.fill();
-        }
-
-        // bar graph
-        debugCanvasCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
-        const barCount = 32;    // power of 2
-        const freqCount = analyser.frequencyBinCount;
-        const freqPerBar = freqCount / barCount;
-        const barWidth = debugCanvas.width / barCount;
-        for (let iBar = 0; iBar < barCount; iBar++) {
-            const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
-            const percent = value / 256;
-            const height = debugCanvas.height * percent;
-            const offset = debugCanvas.height - height - 1;
-            const hue = iBar / barCount * 360;
-            debugCanvasCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-            debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, height);
-        }
-        frame++
-        requestAnimationFrame(animationLoop);
-    }());
-};
+        canvasCtx.beginPath();
+        canvasCtx.fillStyle = 'red';
+        canvasCtx.arc(0, 0, 2, 0, 2 * Math.PI);
+        canvasCtx.fill();
+    }
+}
+function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
+    const barCount = 32; // power of 2
+    const freqCount = analyser.frequencyBinCount;
+    const freqPerBar = freqCount / barCount;
+    const barWidth = debugCanvas.width / barCount;
+    for (let iBar = 0; iBar < barCount; iBar++) {
+        const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
+        const percent = value / 256;
+        const height = debugCanvas.height * percent;
+        const offset = debugCanvas.height - height - 1;
+        const hue = iBar / barCount * 360;
+        debugCanvasCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+        debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, height);
+    }
+}
 
 export const runningCircleFrequencySweepViz = (frame: number, potar: HTMLInputElement) => {
     const sourceFrequency = percentageTofreq(potar.valueAsNumber);
