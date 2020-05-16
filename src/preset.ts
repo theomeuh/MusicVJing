@@ -36,6 +36,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
     // animation loop
     (function animationLoop() {
+        //TODO extract the 3 part in 3 function: runningCircle / debug / spectrum
         canvasCtx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
         analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
         analyser.getByteFrequencyData(freqArray);
@@ -63,15 +64,18 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
         // bar graph
         debugCanvasCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
-        for (var i = 0; i < analyser.frequencyBinCount; i++) {
-            var value = dataArray[i];
-            var percent = value / 256;
-            var height = debugCanvas.height * percent;
-            var offset = debugCanvas.height - height - 1;
-            var barWidth = debugCanvas.width / analyser.frequencyBinCount;
-            var hue = i / analyser.frequencyBinCount * 360;
+        const barCount = 32;    // power of 2
+        const freqCount = analyser.frequencyBinCount;
+        const freqPerBar = freqCount / barCount;
+        const barWidth = debugCanvas.width / barCount;
+        for (let iBar = 0; iBar < barCount; iBar++) {
+            const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
+            const percent = value / 256;
+            const height = debugCanvas.height * percent;
+            const offset = debugCanvas.height - height - 1;
+            const hue = iBar / barCount * 360;
             debugCanvasCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-            debugCanvasCtx.fillRect(i * barWidth, offset, barWidth, height);
+            debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, height);
         }
         frame++
         requestAnimationFrame(animationLoop);
