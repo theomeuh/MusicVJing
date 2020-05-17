@@ -81,15 +81,38 @@ function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
     const barCount = 32; // power of 2
     const freqCount = analyser.frequencyBinCount;
     const freqPerBar = freqCount / barCount;
+
     const barWidth = debugCanvas.width / barCount;
     for (let iBar = 0; iBar < barCount; iBar++) {
         const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
         const percent = value / 256;
-        const height = debugCanvas.height * percent;
-        const offset = debugCanvas.height - height - 1;
-        const hue = iBar / barCount * 360;
-        debugCanvasCtx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
-        debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, height);
+        const blockCount = 12;
+        const blockInterspace = 2; // px
+        const blockHeight = (debugCanvas.height - ((blockCount - 1) * blockInterspace)) / blockCount;
+
+        let iBlock = 0;
+        while (percent > iBlock / blockCount) {
+            const height = blockHeight + iBlock * (blockInterspace + blockHeight);
+            const offset = debugCanvas.height - height;
+
+            let color: string;
+            const blockPercent = iBlock / blockCount
+            if (blockPercent > 0.75) {
+                color = "#ff2b19"   // red
+            } else if (blockPercent > 0.5) {
+                color = "#ffac19"   // orange
+            } else {
+                color = "#0ff"  // cyan
+            }
+            // shadow may slow the animation
+            debugCanvasCtx.shadowBlur = 10;
+            debugCanvasCtx.shadowColor = color;
+            debugCanvasCtx.fillStyle = color;
+            debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, blockHeight);
+            // do not forget to remove blur so other draw can ignore shadow settings
+            debugCanvasCtx.shadowBlur = 0;
+            iBlock++;
+        }
     }
 }
 
