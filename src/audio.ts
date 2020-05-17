@@ -23,5 +23,3 @@ export function maxPercentInFreqRange(freqArray: Uint8Array, minFreq: number, ma
 
     return Math.max(...freqArray.slice(minIndex, maxIndex)) / 256
 }
-
-type AudioSourceCallback = (audioNode: AudioNode) => void;
