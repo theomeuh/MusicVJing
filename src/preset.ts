@@ -82,14 +82,19 @@ function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
     const freqCount = analyser.frequencyBinCount;
     const freqPerBar = freqCount / barCount;
 
-    const barWidth = debugCanvas.width / barCount;
+    const barInterspace = 1; // px
+    const barWidth = (debugCanvas.width - ((barCount - 1) * barInterspace)) / barCount;
+
+    const blockCount = 12;
+    const blockInterspace = 2; // px
+    const blockHeight = (debugCanvas.height - ((blockCount - 1) * blockInterspace)) / blockCount;
+
+    // bar drawing
     for (let iBar = 0; iBar < barCount; iBar++) {
         const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
-        const percent = value / 256;
-        const blockCount = 12;
-        const blockInterspace = 2; // px
-        const blockHeight = (debugCanvas.height - ((blockCount - 1) * blockInterspace)) / blockCount;
+        const percent = value / 256;    // [0..1]
 
+        // block drawing
         let iBlock = 0;
         while (percent > iBlock / blockCount) {
             const height = blockHeight + iBlock * (blockInterspace + blockHeight);
@@ -108,7 +113,7 @@ function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
             debugCanvasCtx.shadowBlur = 10;
             debugCanvasCtx.shadowColor = color;
             debugCanvasCtx.fillStyle = color;
-            debugCanvasCtx.fillRect(iBar * barWidth, offset, barWidth, blockHeight);
+            debugCanvasCtx.fillRect(iBar * (barWidth + barInterspace), offset, barWidth, blockHeight);
             // do not forget to remove blur so other draw can ignore shadow settings
             debugCanvasCtx.shadowBlur = 0;
             iBlock++;
