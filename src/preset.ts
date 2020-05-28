@@ -41,7 +41,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         // animate according to above data
         mainAnimation(freqArray, frame);
         saturationWarning(freqArray);
-        debugSpectrum(analyser, freqArray);
+        debugSpectrum(freqArray);
 
         // increase frame count and request next animation
         frame++
@@ -77,10 +77,8 @@ function saturationWarning(freqArray: Uint8Array) {
         canvasCtx.fill();
     }
 }
-function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
+function debugSpectrum(freqArray: Uint8Array) {
     const barCount = 32; // power of 2
-    const freqCount = analyser.frequencyBinCount;
-    const freqPerBar = freqCount / barCount;
 
     const barInterspace = 1; // px
     const barWidth = (debugCanvas.width - ((barCount - 1) * barInterspace)) / barCount;
@@ -89,10 +87,13 @@ function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
     const blockInterspace = 2; // px
     const blockHeight = (debugCanvas.height - ((blockCount - 1) * blockInterspace)) / blockCount;
 
+    const maxFreqSample = audioCtx.sampleRate / 2;
+    const magicNumber = 40;
     // bar drawing
     for (let iBar = 0; iBar < barCount; iBar++) {
-        const value = Math.max(...freqArray.slice(iBar * freqPerBar, (iBar + 1) * freqPerBar));
-        const percent = value / 256;    // [0..1]
+        const minFreq = magicNumber * Math.pow((maxFreqSample / magicNumber), iBar / barCount);
+        const maxFreq = magicNumber * Math.pow((maxFreqSample / magicNumber), (iBar + 1) / barCount);
+        const percent = maxPercentInFreqRange(freqArray, minFreq, maxFreq);
 
         // block drawing
         let iBlock = 0;
@@ -101,13 +102,13 @@ function debugSpectrum(analyser: AnalyserNode, freqArray: Uint8Array) {
             const offset = debugCanvas.height - height;
 
             let color: string;
-            const blockPercent = iBlock / blockCount
+            const blockPercent = iBlock / blockCount;
             if (blockPercent > 0.75) {
-                color = "#ff2b19"   // red
+                color = "#ff2b19";   // red
             } else if (blockPercent > 0.5) {
-                color = "#ffac19"   // orange
+                color = "#ffac19";   // orange
             } else {
-                color = "#0ff"  // cyan
+                color = "#0ff"; // cyan
             }
             // shadow may slow the animation
             debugCanvasCtx.shadowBlur = 10;

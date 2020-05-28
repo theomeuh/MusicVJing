@@ -21,5 +21,5 @@ export function maxPercentInFreqRange(freqArray: Uint8Array, minFreq: number, ma
     const minIndex = Math.round(minFreq / maxFreqSample * freqArray.length);
     const maxIndex = Math.round(maxFreq / maxFreqSample * freqArray.length);
 
-    return Math.max(...freqArray.slice(minIndex, maxIndex)) / 256
+    return Math.max(...freqArray.slice(minIndex, Math.max(minIndex + 1, maxIndex))) / 256   // if slice has 2 times the same indexes, it returns an empty list
 }
