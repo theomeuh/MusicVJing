@@ -1,19 +1,9 @@
 // manage audio part of project
 
-import { audioCtx, canvasCtx, canvas } from "./global";
+import { audioCtx } from "./global";
 
 
 export const getMicStream = () => navigator.mediaDevices.getUserMedia({ audio: true });
-
-
-export function sinWaveSource(frequency: number) {
-    var oscillator = audioCtx.createOscillator();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime); // value in hertz
-    oscillator.start();
-
-    return oscillator
-}
 
 
 export function maxPercentInFreqRange(freqArray: Uint8Array, minFreq: number, maxFreq: number) {

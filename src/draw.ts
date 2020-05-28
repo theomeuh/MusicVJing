@@ -1,6 +1,6 @@
 // manage visual part of project
 
-import { canvasCtx as ctx, canvas } from "./global";
+import { canvasCtx as ctx } from "./global";
 import { degreesToRadians } from "./utils";
 
 

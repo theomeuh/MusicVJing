@@ -1,7 +1,7 @@
 // entrypoint
 
 import { canvas, canvasCtx, debugCanvas, potar1 } from "./global";
-import { runningCircleFrequencySweepViz, runningCircleMicViz } from "./preset";
+import { runningCircleMicViz } from "./preset";
 
 canvas.style.border = '1px solid #63eccd';
 canvas.width = window.innerWidth * 9 / 10;
@@ -15,4 +15,3 @@ debugCanvas.height = window.innerHeight * 3 / 20;
 var frame = 0;  // Animation frame
 
 runningCircleMicViz(frame, potar1);
-// runningCircleFrequencySweepViz(frame, potar1);
