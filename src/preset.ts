@@ -1,7 +1,7 @@
 import { maxPercentInFreqRange, getMicStream } from "./audio";
 import { runningCircle } from "./draw";
 import { audioCtx, canvas, canvasCtx, debugCanvas, debugCanvasCtx } from "./global";
-import { percentageToGain } from "./utils";
+import { percentageTodBGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
     // get audio input stream  (mic or speakers)
@@ -15,12 +15,12 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
     const analyserGain = audioCtx.createGain();
     const analyser = audioCtx.createAnalyser();
     const bufferLength = analyser.frequencyBinCount;
-    const freqArray = new Uint8Array(bufferLength);
+    const freqByteArray = new Uint8Array(bufferLength);
 
     // audio send to analyser is amplified up to maxGain
-    const maxGain = 4
-    const gainPotar = percentageToGain(maxGain);
-    potar1.value = (100 / maxGain).toString();    // initial gain is 1
+    const maxGain = 12;  // in dB. 6 dB double values of the signals ; 18 dB multiply them by 8
+    const gainPotar = percentageTodBGain(maxGain);
+    potar1.value = (50).toString();    // initial gain is 1
 
     // set up nodes and connections
     analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
@@ -36,12 +36,12 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
 
         // read / write required data for animations
         analyserGain.gain.value = gainPotar(potar1.valueAsNumber);
-        analyser.getByteFrequencyData(freqArray);
+        analyser.getByteFrequencyData(freqByteArray);
 
         // animate according to above data
-        mainAnimation(freqArray, frame);
-        saturationWarning(freqArray);
-        debugSpectrum(freqArray);
+        mainAnimation(freqByteArray, frame);
+        saturationWarning(freqByteArray);
+        debugSpectrum(freqByteArray);
 
         // increase frame count and request next animation
         frame++
