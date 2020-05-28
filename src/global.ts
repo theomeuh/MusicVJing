@@ -13,3 +13,10 @@ export const potar1 = <HTMLInputElement>document.getElementById('potar1');
 
 // audio
 export var audioCtx = new window.AudioContext();    // TODO offlineContext faster ? ?
+
+// config
+export var config = {
+    BORDER: false,
+    DEBUG: false,
+    POTAR: true
+}

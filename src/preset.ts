@@ -1,6 +1,6 @@
 import { maxPercentInFreqRange, getMicStream } from "./audio";
 import { runningCircle } from "./draw";
-import { audioCtx, canvas, canvasCtx, debugCanvas, debugCanvasCtx } from "./global";
+import { audioCtx, canvas, canvasCtx, debugCanvas, debugCanvasCtx, config } from "./global";
 import { percentageTodBGain } from "./utils";
 
 export async function runningCircleMicViz(frame: number, potar1: HTMLInputElement) {
@@ -41,7 +41,7 @@ export async function runningCircleMicViz(frame: number, potar1: HTMLInputElemen
         // animate according to above data
         mainAnimation(freqByteArray, frame);
         saturationWarning(freqByteArray);
-        debugSpectrum(freqByteArray);
+        if (config.DEBUG) debugSpectrum(freqByteArray);
 
         // increase frame count and request next animation
         frame++
